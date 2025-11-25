@@ -1,32 +1,29 @@
-/**
- * Updated by trungquandev.com's author on August 17 2023
- * YouTube: https://youtube.com/@trungquandev
- * "A bit of fragrance clings to the hand that gives flowers!"
- */
-
+/* eslint-disable no-console */
 import express from 'express'
-import { mapOrder } from '~/utils/sorts.js'
+import { env } from './config/environment'
+import { mongodb } from './config/mongodb'
 
-const app = express()
+const START_APP = () => {
+  const app = express()
 
-const hostname = 'localhost'
-const port = 8017
+  const hostname = env.APP_HOST
+  const port = env.APP_PORT
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  console.log(mapOrder(
-    [ { id: 'id-1', name: 'One' },
-      { id: 'id-2', name: 'Two' },
-      { id: 'id-3', name: 'Three' },
-      { id: 'id-4', name: 'Four' },
-      { id: 'id-5', name: 'Five' } ],
-    ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-    'id'
-  ))
-  res.end('<h1>Hello World!</h1><hr>')
-})
+  app.listen(port, hostname, () => {
+    // eslint-disable-next-line no-console
+    console.log(`3. Server is running at http://${hostname}:${port}`)
+  })
+}
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Hello Trung Quan Dev, I am running at ${ hostname }:${ port }/`)
-})
+(async () => {
+  try {
+    // connect to db
+    console.log('1. Connecting to db ...')
+    await mongodb.CONNECT()
+    console.log('2. Connected to db')
+    START_APP()
+  } catch (err) {
+    console.log(err)
+    process.exit(0)
+  }
+})()
