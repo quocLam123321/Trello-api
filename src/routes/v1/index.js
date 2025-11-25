@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { boardRoutes } from './boardRoutes'
+import { boardRoute } from './boardRoute'
 
 const router = Router()
 
@@ -10,6 +10,6 @@ router.route('/')
   })
 
 // board routes
-router.use('/boards', boardRoutes)
+router.use('/boards', boardRoute)
 
 export const API_V1 = router

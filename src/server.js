@@ -7,7 +7,11 @@ import { API_V1 } from './routes/v1'
 const START_APP = () => {
   const app = express()
 
+  app.use(express.json())
+
+  // sử dụng api v1
   app.use('/v1', API_V1)
+
 
   const hostname = env.APP_HOST
   const port = env.APP_PORT
