@@ -2,9 +2,12 @@
 import express from 'express'
 import { env } from './config/environment'
 import { mongodb } from './config/mongodb'
+import { API_V1 } from './routes/v1'
 
 const START_APP = () => {
   const app = express()
+
+  app.use('/v1', API_V1)
 
   const hostname = env.APP_HOST
   const port = env.APP_PORT
