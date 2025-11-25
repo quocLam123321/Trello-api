@@ -9,12 +9,11 @@ const createNew = async (req, res, next) => {
   })
 
   try {
-    console.log('reqBody : ', req.body)
+    console.log('validation')
 
     await correctSchema.validateAsync(req.body, { abortEarly: false })
-    res.status(StatusCodes.CREATED).json({ message: 'Board created successfully' })
+    next()
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ message: new Error(error).message })
   }
 
