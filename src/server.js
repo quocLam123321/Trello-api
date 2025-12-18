@@ -22,6 +22,8 @@ const START_APP = () => {
   app.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
     console.log(`3. Server is running at http://${hostname}:${port}`)
+    if (env.BUILD_MODE === 'dev') console.log('4. Server is running in DEV mode')
+    else console.log('4. Server is running in PRODUCTION mode')
   })
 }
 
