@@ -10,7 +10,7 @@ const createNew = async (req, res, next) => {
   })
 
   try {
-    console.log('validation')
+    // console.log('validation')
 
     await correctSchema.validateAsync(req.body, { abortEarly: false })
     next()
