@@ -15,7 +15,7 @@ const CONNECT = async () => {
   trelloDatabaseInstance = mongodbClientInstance.db(process.env.DATABASE_NAME)
 }
 
-const GET_DB = async () => {
+const GET_DB = () => {
   if (!trelloDatabaseInstance) throw new Error('Must connect to database first')
   return trelloDatabaseInstance
 }
