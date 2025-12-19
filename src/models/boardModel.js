@@ -20,7 +20,9 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
 
 const createNew = async (data) => {
   try {
-    const createdBoard = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(data)
+    // validate dữ liệu một lần nữa trước khi lưu vào sb
+    const validatedData = await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+    const createdBoard = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validatedData)
     return createdBoard
   } catch (error) { throw new Error(error) }
 }
