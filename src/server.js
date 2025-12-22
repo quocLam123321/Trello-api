@@ -1,12 +1,16 @@
 /* eslint-disable no-console */
 import express from 'express'
+import cors from 'cors'
 import { env } from './config/environment'
 import { mongodb } from './config/mongodb'
 import { API_V1 } from './routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
+import { corsOptions } from './config/cors'
 
 const START_APP = () => {
   const app = express()
+
+  app.use(cors(corsOptions))
 
   app.use(express.json())
 
