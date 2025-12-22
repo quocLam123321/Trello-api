@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 
 import { StatusCodes } from 'http-status-codes'
-import { ObjectId } from 'mongodb'
+import { cloneDeep } from 'lodash'
 import { boardModel } from '~/models/boardModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
@@ -28,7 +28,16 @@ const getDetail = async (id) => {
   try {
     const boardDetail = await boardModel.getDetail(id)
     if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
-    return boardDetail
+    // console.log('boardDetail : ', boardDetail)
+
+    const boardAfterEdit = cloneDeep(boardDetail)
+    // đưa card về đúng column của nó
+    boardAfterEdit.columns.forEach(column => {
+      column.cards = boardAfterEdit.cards.filter(card => card.columnId.toString() === column._id.toString())
+    })
+    // xóa cards nằm song song với columns ở board đi
+    delete boardAfterEdit.cards
+    return boardAfterEdit
   } catch (error) {
     throw error
   }
