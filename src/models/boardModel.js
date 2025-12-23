@@ -62,7 +62,7 @@ const getDetail = async (id) => {
         } }
       ]).toArray()
     // console.log('board : ', board)
-    return board[0] || {}
+    return board[0] || null
   } catch (error) {
     throw new Error(error)
   }
