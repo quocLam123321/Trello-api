@@ -1,5 +1,7 @@
 import Joi from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { mongodb } from '~/config/mongodb'
+import { ObjectId } from 'mongodb'
 
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
@@ -17,7 +19,27 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const createNew = async (data) => {
+  try {
+    // validate dữ liệu một lần nữa trước khi lưu vào sb
+    const validatedData = await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+    const createdBoard = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(validatedData)
+    return createdBoard
+  } catch (error) { throw new Error(error) }
+}
+
+const findOneById = async (id) => {
+  try {
+    const board = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    return board
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
-  COLUMN_COLLECTION_SCHEMA
+  COLUMN_COLLECTION_SCHEMA,
+  createNew,
+  findOneById
 }
