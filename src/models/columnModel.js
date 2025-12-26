@@ -23,23 +23,42 @@ const createNew = async (data) => {
   try {
     // validate dữ liệu một lần nữa trước khi lưu vào sb
     const validatedData = await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
-    const createdBoard = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(validatedData)
-    return createdBoard
+    const newColumnToAdd = {
+      ...validatedData,
+      boardId: new ObjectId(validatedData.boardId)
+    }
+    const createdColumn = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(newColumnToAdd)
+    return createdColumn
   } catch (error) { throw new Error(error) }
 }
 
 const findOneById = async (id) => {
   try {
-    const board = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
-    return board
+    const column = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    return column
   } catch (error) {
     throw new Error(error)
   }
+}
+
+// hàm này có nhiệm vụ thêm một cardId vào cuối mảng CardOrderIds trong column
+const pushCardOrderIds = async (card) => {
+  try {
+    const result = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(card.columnId) },
+      { $push: {
+        cardOrderIds: new ObjectId(card._id)
+      } },
+      { ReturnDocument: 'after' } //có cái này để nó trả về document mới đã được update
+    )
+    return result
+  } catch (error) { throw new Error(error) }
 }
 
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
-  findOneById
+  findOneById,
+  pushCardOrderIds
 }

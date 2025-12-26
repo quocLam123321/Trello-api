@@ -21,15 +21,20 @@ const createNew = async (data) => {
   try {
     // validate dữ liệu một lần nữa trước khi lưu vào sb
     const validatedData = await CARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
-    const createdBoard = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).insertOne(validatedData)
-    return createdBoard
+    const newCardToAdd = {
+      ...validatedData,
+      boardId: new ObjectId(validatedData.boardId),
+      columnId: new ObjectId(validatedData.columnId)
+    }
+    const createdCard = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).insertOne(newCardToAdd)
+    return createdCard
   } catch (error) { throw new Error(error) }
 }
 
 const findOneById = async (id) => {
   try {
-    const board = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
-    return board
+    const card = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    return card
   } catch (error) {
     throw new Error(error)
   }

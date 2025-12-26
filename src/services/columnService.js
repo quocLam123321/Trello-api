@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-catch */
 
+import { boardModel } from '~/models/boardModel'
 import { columnModel } from '~/models/columnModel'
 
 const createNew = async (body) => {
@@ -12,6 +13,15 @@ const createNew = async (body) => {
     // console.log('createdColumn : ', createdColumn)
 
     const column = await columnModel.findOneById(createdColumn.insertedId)
+
+    if (column) {
+      // xử lý cấu trúc data, thêm mảng card rỗng cho column khi tạo mới
+      column.cards = []
+
+      // update columnOrderIds trong board
+      await boardModel.pushColumnOrderIds(column)
+    }
+
     return column
   } catch (error) {
     throw error
