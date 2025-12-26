@@ -68,10 +68,25 @@ const getDetail = async (id) => {
   }
 }
 
+// hàm này có nhiệm vụ thêm một columnId vào cuối mảng columnOrderIds trong board
+const pushColumnOrderIds = async (column) => {
+  try {
+    const result = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $push: {
+        columnOrderIds: new ObjectId(column._id)
+      } },
+      { ReturnDocument: 'after' } //có cái này để nó trả về document mới đã được update
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getDetail
+  getDetail,
+  pushColumnOrderIds
 }
