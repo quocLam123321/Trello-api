@@ -23,6 +23,29 @@ const createNew = async (req, res, next) => {
 
 }
 
+const updateBoard = async (req, res, next) => {
+  // lưu ý khi update ta sẽ không require
+  const correctSchema = Joi.object({
+    title: Joi.string().min(3).max(50).trim().strict(),
+    description: Joi.string().min(3).max(256).trim().strict(),
+    type: Joi.string().valid(...Object.values(BOARD_TYPES))
+  })
+
+  try {
+    // console.log('validation')
+
+    await correctSchema.validateAsync(req.body, {
+      abortEarly: false,
+      allowUnknown: true // có thể update các field không cần phải validate
+    })
+    next()
+  } catch (error) {
+    // res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ message: new Error(error).message })
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
+
 export const boardValidation = {
-  createNew
+  createNew,
+  updateBoard
 }
