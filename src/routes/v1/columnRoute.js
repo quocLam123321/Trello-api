@@ -8,4 +8,7 @@ const router = Router()
 router.route('/')
   .post(columnValidation.createNew, columnController.createNew)
 
+router.route('/:id')
+  .put(columnValidation.updateColumn, columnController.updateColumn)
+
 export const columnRoute = router
