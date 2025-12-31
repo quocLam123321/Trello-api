@@ -17,6 +17,9 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+// chỉ định những fields ta không cho phép update
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const createNew = async (data) => {
   try {
     // validate dữ liệu một lần nữa trước khi lưu vào sb
@@ -40,9 +43,27 @@ const findOneById = async (id) => {
   }
 }
 
+const updateCard = async (id, updateData) => {
+  try {
+    // lọc field
+    Object.keys(updateData).forEach(field => {
+      if (INVALID_UPDATE_FIELDS.includes(field)) {
+        delete updateData[field]
+      }
+    })
+    const result = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set : updateData },
+      { returnDocument: 'after' } //có cái này để nó trả về document mới đã được update
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
-  findOneById
+  findOneById,
+  updateCard
 }
