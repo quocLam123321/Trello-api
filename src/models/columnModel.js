@@ -20,7 +20,7 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
 })
 
 // chỉ định những fields ta không cho phép update
-const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'boardId']
 
 const createNew = async (data) => {
   try {
@@ -66,6 +66,12 @@ const updateColumn = async (id, updateData) => {
         delete updateData[field]
       }
     })
+
+    // xử lý ObjectId
+    if (updateData.cardOrderIds) {
+      updateData.cardOrderIds = updateData.cardOrderIds.map(cardId => new ObjectId(cardId))
+    }
+
     const result = await mongodb.GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set : updateData },

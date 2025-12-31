@@ -93,6 +93,12 @@ const updateBoard = async (id, updateData) => {
         delete updateData[field]
       }
     })
+
+    // xử lý ObjectId
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map(columnId => new ObjectId(columnId))
+    }
+
     const result = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set : updateData },

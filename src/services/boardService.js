@@ -3,8 +3,11 @@
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { boardModel } from '~/models/boardModel'
+import { cardModel } from '~/models/cardModel'
+import { columnModel } from '~/models/columnModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
+import { ObjectId } from 'mongodb'
 
 const createNew = async (body) => {
   try {
@@ -33,7 +36,8 @@ const getDetail = async (id) => {
     const boardAfterEdit = cloneDeep(boardDetail)
     // đưa card về đúng column của nó
     boardAfterEdit.columns.forEach(column => {
-      column.cards = boardAfterEdit.cards.filter(card => card.columnId.toString() === column._id.toString())
+      // column.cards = boardAfterEdit.cards.filter(card => card.columnId.toString() === column._id.toString())
+      column.cards = boardAfterEdit.cards.filter(card => card.columnId.equals(column._id))
     })
     // xóa cards nằm song song với columns ở board đi
     delete boardAfterEdit.cards
@@ -56,8 +60,34 @@ const updateBoard = async (id, reqBody) => {
   }
 }
 
+
+const moveCardToDifferentColumn = async (reqBody) => {
+  try {
+
+    // B1: update cardOrderIds của column ban đầu => xóa cardId của cái card vừa kéo đi
+    await columnModel.updateColumn(reqBody.oldColumnId, {
+      cardOrderIds: reqBody.oldCardOrderIds,
+      updatedAt: Date.now()
+    })
+    // B2: update cardOrderIds của column đích => thêm cardId của cái card vừa kéo đến vào column đích
+    await columnModel.updateColumn(reqBody.newColumnId, {
+      cardOrderIds: reqBody.newCardOrderIds,
+      updatedAt: Date.now()
+    })
+    // B3: update lại columnId của cái card vừa kéo đó thành column đích
+    await cardModel.updateCard(reqBody.currentCardId, {
+      columnId: new ObjectId(reqBody.newColumnId)
+    })
+
+    return { message: 'Successfully' }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const boardService = {
   createNew,
   getDetail,
-  updateBoard
+  updateBoard,
+  moveCardToDifferentColumn
 }
