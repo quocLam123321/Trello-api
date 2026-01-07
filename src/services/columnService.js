@@ -1,7 +1,10 @@
 /* eslint-disable no-useless-catch */
 
+import { StatusCodes } from 'http-status-codes'
 import { boardModel } from '~/models/boardModel'
+import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
+import ApiError from '~/utils/ApiError'
 
 const createNew = async (body) => {
   try {
@@ -41,7 +44,30 @@ const updateColumn = async (id, reqBody) => {
   }
 }
 
+const deleteColumn = async (id) => {
+  try {
+
+    // tìm column theo columnId
+    const targetColumn = await columnModel.findOneById(id)
+    if (!targetColumn) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found')
+    }
+
+    // xóa column
+    await columnModel.deleteOneById(id)
+    // xóa card thuộc column trên
+    await cardModel.deleteAllCardsByColumnId(id)
+    // update columnOrderIds trong board
+    await boardModel.pullColumnOrderIds(targetColumn)
+
+    return { deleteResult: 'Column and its card deleted successfully' }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const columnService = {
   createNew,
-  updateColumn
+  updateColumn,
+  deleteColumn
 }
