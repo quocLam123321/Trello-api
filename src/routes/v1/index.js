@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { boardRoute } from './boardRoute'
 import { columnRoute } from './columnRoute'
 import { cardRoute } from './cardRoute'
+import { userRoute } from './userRoute'
 
 const router = Router()
 
@@ -19,5 +20,8 @@ router.use('/columns', columnRoute)
 
 // card routes
 router.use('/cards', cardRoute)
+
+// user routes
+router.use('/users', userRoute)
 
 export const API_V1 = router
