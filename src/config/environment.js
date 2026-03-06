@@ -8,5 +8,9 @@ export const env = {
   APP_HOST: process.env.APP_HOST,
   APP_PORT: process.env.APP_PORT,
 
-  BUILD_MODE: process.env.BUILD_MODE
+  BUILD_MODE: process.env.BUILD_MODE,
+
+  DOMAIN_WEB: process.env.DOMAIN_WEB,
+
+  RESEND_API_KEY: process.env.RESEND_API_KEY
 }
