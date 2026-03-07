@@ -9,6 +9,29 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const verify = async (req, res, next) => {
+  try {
+    res.status(StatusCodes.OK).json(await userService.verify(req.body))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const login = async (req, res, next) => {
+  try {
+    const result = await userService.login(req.body)
+
+    // xử lý cookie
+    console.log('🚀 ~ login ~ result:', result)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
-  createNew
+  createNew,
+  verify,
+  login
 }
