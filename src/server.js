@@ -6,9 +6,18 @@ import { mongodb } from './config/mongodb'
 import { API_V1 } from './routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import { corsOptions } from './config/cors'
+import cookieParser from 'cookie-parser'
 
 const START_APP = () => {
   const app = express()
+  // fix cái cache from disk của expressJs
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
+
+  // cấu hình cookie parser
+  app.use(cookieParser())
 
   app.use(cors(corsOptions))
 

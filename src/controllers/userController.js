@@ -1,4 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
+import ms from 'ms'
+import { env } from '~/config/environment'
 import { userService } from '~/services/userService'
 
 const createNew = async (req, res, next) => {
@@ -22,7 +24,24 @@ const login = async (req, res, next) => {
     const result = await userService.login(req.body)
 
     // xử lý cookie
-    console.log('🚀 ~ login ~ result:', result)
+    /**
+     * xử lý trưởng hợp trả về http only cookie cho phía client
+     * đối với maxAge - thời gian sống của cookie ta sẽ để bằng với thời gian hết hạn của refreshToken, tùy dự án
+     * lưu ý: thời gian sống của cookie khác với thời gian sống của token
+     */
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
+    })
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
+    })
 
     res.status(StatusCodes.OK).json(result)
   } catch (error) {

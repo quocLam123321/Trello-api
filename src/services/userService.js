@@ -90,8 +90,17 @@ const login = async (reqBody) => {
     }
 
     // tạo 2 loại token
-    const accessToken = await JwtProvider.generateToken(payload, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE)
-    const refreshToken = await JwtProvider.generateToken(payload, env.REFRESH_TOKEN_SECRET_SIGNATURE, env.REFRESH_TOKEN_LIFE)
+    const accessToken = await JwtProvider.generateToken(
+      payload,
+      env.ACCESS_TOKEN_SECRET_SIGNATURE,
+      // 5
+      env.ACCESS_TOKEN_LIFE
+    )
+    const refreshToken = await JwtProvider.generateToken(
+      payload,
+      env.REFRESH_TOKEN_SECRET_SIGNATURE,
+      env.REFRESH_TOKEN_LIFE
+    )
 
     // trả về userInfo và 2 loại token
     return { ...pickUser(existUser), accessToken, refreshToken }
