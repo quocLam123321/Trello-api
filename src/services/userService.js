@@ -99,6 +99,7 @@ const login = async (reqBody) => {
     const refreshToken = await JwtProvider.generateToken(
       payload,
       env.REFRESH_TOKEN_SECRET_SIGNATURE,
+      // 10
       env.REFRESH_TOKEN_LIFE
     )
 
@@ -109,8 +110,31 @@ const login = async (reqBody) => {
   }
 }
 
+const refreshToken = async (refreshToken) => {
+  try {
+    // 1. xác thực refresh token
+    const refreshTokenDecoded = await JwtProvider.verifyToken(refreshToken, env.REFRESH_TOKEN_SECRET_SIGNATURE)
+    // 2. nếu verify thành công thì tạo payload cho access token mới
+    const payload = {
+      _id: refreshTokenDecoded._id,
+      email: refreshTokenDecoded.email
+    }
+    // 3. tạo access token mới
+    const newAccessToken = await JwtProvider.generateToken(
+      payload,
+      env.ACCESS_TOKEN_SECRET_SIGNATURE,
+      // 5
+      env.ACCESS_TOKEN_LIFE
+    )
+    return { accessToken: newAccessToken }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   createNew,
   verify,
-  login
+  login,
+  refreshToken
 }
