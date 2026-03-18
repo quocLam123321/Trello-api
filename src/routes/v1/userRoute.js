@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { userController } from '~/controllers/userController'
+import { authMiddleware } from '~/middlewares/authMiddleware'
 import { userValidation } from '~/validations/userValidation'
 
 
@@ -19,5 +20,8 @@ router.route('/logout')
 
 router.route('/refresh_token')
   .put(userController.refreshToken)
+
+router.route('/update')
+  .put(authMiddleware.isAuthorized, userValidation.update, userController.update)
 
 export const userRoute = router

@@ -43,7 +43,9 @@ const login = async (req, res, next) => {
       sameSite: 'none',
       maxAge: ms('14 days')
     })
-
+    // ko trả về token ở đây vì không dùng localStorage
+    delete result.accessToken
+    delete result.refreshToken
     res.status(StatusCodes.OK).json(result)
   } catch (error) {
     next(error)
@@ -81,10 +83,19 @@ const refreshToken = async (req, res, next) => {
   }
 }
 
+const update = async (req, res, next) => {
+  try {
+    const userId = req.jwtDecoded._id
+    const updatedUser = await userService.update(userId, req.body)
+    res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) { next(error) }
+}
+
 export const userController = {
   createNew,
   verify,
   login,
   logout,
-  refreshToken
+  refreshToken,
+  update
 }
