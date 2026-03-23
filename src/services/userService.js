@@ -7,6 +7,7 @@ import { pickUser } from '~/utils/formatters'
 import { env } from '~/config/environment'
 import { ResendProvider } from '~/providers/ResendProvider'
 import { JwtProvider } from '~/providers/JwtProvider'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 
 const createNew = async (reqBody) => {
   try {
@@ -132,7 +133,7 @@ const refreshToken = async (refreshToken) => {
   }
 }
 
-const update = async (userId, reqBody) => {
+const update = async (userId, reqBody, userAvtFile) => {
   try {
     // query user trong db
     const existUser = await userModel.findOneById(userId)
@@ -150,6 +151,14 @@ const update = async (userId, reqBody) => {
       // update password
       updatedUser = await userModel.update(existUser._id, {
         password: bcryptjs.hashSync(reqBody.new_password, 8)
+      })
+    } else if (userAvtFile) {
+      // case 2: update avatar -> sử dụng cloudinary
+      const uploadResult = await CloudinaryProvider.streamUpload(userAvtFile.buffer, 'Trello-user-avatar')
+      // console.log('🚀 ~ update ~ uploadResult:', uploadResult)
+      // lưu URL của ảnh vào db thông qua secure_url
+      updatedUser = await userModel.update(existUser._id, {
+        avatar: uploadResult.secure_url
       })
     } else {
       // update các thông tin chung: displayName, ...
