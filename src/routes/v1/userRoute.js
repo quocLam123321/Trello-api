@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { userController } from '~/controllers/userController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { multerUploadMiddleware } from '~/middlewares/multerUploadMiddleware'
 import { userValidation } from '~/validations/userValidation'
 
 
@@ -22,6 +23,11 @@ router.route('/refresh_token')
   .put(userController.refreshToken)
 
 router.route('/update')
-  .put(authMiddleware.isAuthorized, userValidation.update, userController.update)
+  .put(
+    authMiddleware.isAuthorized,
+    multerUploadMiddleware.upload.single('avatar'),
+    userValidation.update,
+    userController.update
+  )
 
 export const userRoute = router
