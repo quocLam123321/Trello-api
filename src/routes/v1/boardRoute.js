@@ -8,9 +8,7 @@ import { boardValidation } from '~/validations/boardValidation'
 const router = Router()
 
 router.route('/')
-  .get(authMiddleware.isAuthorized, (req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'GET: API get list boards' })
-  })
+  .get(authMiddleware.isAuthorized, boardController.getBoards)
   .post(authMiddleware.isAuthorized, boardValidation.createNew, boardController.createNew)
 
 router.route('/:id')
