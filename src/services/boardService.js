@@ -8,6 +8,7 @@ import { columnModel } from '~/models/columnModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ObjectId } from 'mongodb'
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 
 const createNew = async (body) => {
   try {
@@ -85,9 +86,23 @@ const moveCardToDifferentColumn = async (reqBody) => {
   }
 }
 
+const getBoards = async (userId, page, itemsPerPage) => {
+  try {
+    // dù bên FE không đây lên page hoặc itemsPerPage thì BE cũng phải gán giá trị default
+    if (!page) page = DEFAULT_PAGE
+    if (!itemsPerPage) itemsPerPage = DEFAULT_ITEMS_PER_PAGE
+
+    const result = await boardModel.getBoards(userId, parseInt(page, 10), parseInt(itemsPerPage, 10))
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 export const boardService = {
   createNew,
   getDetail,
   updateBoard,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  getBoards
 }
