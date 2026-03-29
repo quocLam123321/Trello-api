@@ -12,7 +12,8 @@ const createNew = async (req, res, next) => {
     // console.log('req.cookies : ', req.cookies)
     // console.log('req.jwtDecode : ', req.jwtDecode)
 
-    const createdBoard = await boardService.createNew(req.body)
+    const userId = req.jwtDecoded._id
+    const createdBoard = await boardService.createNew(userId, req.body)
 
     res.status(StatusCodes.CREATED).json(createdBoard)
   } catch (error) {
@@ -23,7 +24,9 @@ const createNew = async (req, res, next) => {
 const getDetail = async (req, res, next) => {
   try {
     // console.log('id : ', req.params.id)
-    res.status(StatusCodes.OK).json(await boardService.getDetail(req.params.id))
+    const userId = req.jwtDecoded._id
+    const BoardId = req.params.id
+    res.status(StatusCodes.OK).json(await boardService.getDetail(userId, BoardId))
   } catch (error) {
     next(error)
   }

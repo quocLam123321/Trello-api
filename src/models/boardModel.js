@@ -34,11 +34,15 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
 // chỉ định những fields ta không cho phép update
 const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
 
-const createNew = async (data) => {
+const createNew = async (userId, data) => {
   try {
     // validate dữ liệu một lần nữa trước khi lưu vào sb
     const validatedData = await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
-    const createdBoard = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validatedData)
+    const newBoardToAdd = {
+      ...validatedData,
+      ownerIds: [new ObjectId(userId)]
+    }
+    const createdBoard = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoardToAdd)
     return createdBoard
   } catch (error) { throw new Error(error) }
 }
@@ -52,14 +56,21 @@ const findOneById = async (id) => {
   }
 }
 
-const getDetail = async (id) => {
+const getDetail = async (userId, BoardId) => {
   try {
+
+    const queryCondition = [
+      { _id: new ObjectId(BoardId) },
+      { _destroy: false },
+      { $or: [
+        { ownerIds: new ObjectId(userId) },
+        { memberIds: new ObjectId(userId) }
+      ] }
+    ]
+
     const board = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME)
       .aggregate([
-        { $match: {
-          _id: new ObjectId(id),
-          _destroy : false
-        } },
+        { $match: { $and: queryCondition } },
         { $lookup: {
           from: columnModel.COLUMN_COLLECTION_NAME,
           localField: '_id',

@@ -10,14 +10,14 @@ import { slugify } from '~/utils/formatters'
 import { ObjectId } from 'mongodb'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 
-const createNew = async (body) => {
+const createNew = async (userId, body) => {
   try {
     const newBoard = {
       ...body,
       slug: slugify(body.title)
     }
 
-    const createdBoard = await boardModel.createNew(newBoard)
+    const createdBoard = await boardModel.createNew(userId, newBoard)
     // console.log('createdBoard : ', createdBoard)
 
     const board = await boardModel.findOneById(createdBoard.insertedId)
@@ -28,9 +28,9 @@ const createNew = async (body) => {
 }
 
 // tạm thời hàm này chỉ như thế thôi mình sẽ học aggregate sau để lấy các column và card thuộc về cái board đó
-const getDetail = async (id) => {
+const getDetail = async (userId, BoardId) => {
   try {
-    const boardDetail = await boardModel.getDetail(id)
+    const boardDetail = await boardModel.getDetail(userId, BoardId)
     if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     // console.log('boardDetail : ', boardDetail)
 
