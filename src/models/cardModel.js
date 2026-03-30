@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { EMAIL_RULE, EMAIL_RULE_MESSAGE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { mongodb } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
 
@@ -11,6 +11,20 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
 
   title: Joi.string().required().min(3).max(50).trim().strict(),
   description: Joi.string().optional(),
+
+  cover: Joi.string().default(null),
+  memberIds: Joi.array().items(
+    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  ),
+  // dữ liệu comment của card ta sẽ học cách nhúng - embedded vào bản ghi card luôn
+  comments: Joi.array().items({
+    userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    userEmail: Joi.string().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
+    userAvatar: Joi.string(),
+    content: Joi.string(),
+    // chô này lưu ý vì dùng hàm $push để thêm comment nên không set default Date.now luôn giống cái insertOne nhue crate được
+    commentedAt: Joi.date().timestamp()
+  }).default([]),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
