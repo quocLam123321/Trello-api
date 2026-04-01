@@ -14,3 +14,13 @@ export const USER_ROLES = {
 
 export const DEFAULT_PAGE = 1
 export const DEFAULT_ITEMS_PER_PAGE = 12
+
+export const INVITATION_TYPE = {
+  BOARD_INVITATION: 'BOARD_INVITATION'
+}
+
+export const BOARD_INVITATION_STATUS = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
+}
