@@ -21,6 +21,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     userEmail: Joi.string().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
     userAvatar: Joi.string(),
+    userDisplayName: Joi.string(),
     content: Joi.string(),
     // chô này lưu ý vì dùng hàm $push để thêm comment nên không set default Date.now luôn giống cái insertOne nhue crate được
     commentedAt: Joi.date().timestamp()
@@ -83,11 +84,31 @@ const deleteAllCardsByColumnId = async (columnId) => {
   }
 }
 
+const unshiftNewComment = async (cardId, commentData) => {
+  try {
+    const result = await mongodb.GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(cardId) },
+      /**
+       * Đẩy 1 comment mới vào array comment của card
+       * - trong js ngược lại vs push (thêm phần tử vào cuối mảng) là unshift (thêm phần tử vào đầu mảng)
+       * - nhưng trong mongoDB thì chỉ có push thôi nên muốn làm như unshift, thì phải bọc data vào array để trong each và chỉ đinh position là 0 để nó thêm vào đầu mảng
+       * - tất nhiên push vào cuối mảng cũng được xong khi lấy data trả về cho fe bên service thì mình lộn ngược cái mảng lại là được
+       */
+      { $push: { comments: { $each: [commentData], $position: 0 } } },
+      { returnDocument: 'after' } //có cái này để nó trả về document mới đã được update
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   updateCard,
-  deleteAllCardsByColumnId
+  deleteAllCardsByColumnId,
+  unshiftNewComment
 }
