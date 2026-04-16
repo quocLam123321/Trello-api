@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { boardModel } from '~/models/boardModel'
 import { invitationModel } from '~/models/invitationModel'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
@@ -10,7 +11,7 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
     // kiểm tra xem các dữ liệu cần có tồn tại trong sb ko
     const inviter = await userModel.findOneById(inviterId)
     const invitee = await userModel.findOneByEmail(reqBody.inviteeEmail)
-    const board = await userModel.findOneById(reqBody.boardId)
+    const board = await boardModel.findOneById(reqBody.boardId)
     if (!inviter || !invitee || !board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Inviter, invitee or board not found')
     }
@@ -43,6 +44,25 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
   }
 }
 
+const getInvitations = async (userId) => {
+  try {
+    const getInvitations = await invitationModel.findByUser(userId)
+    // console.log('🚀 ~ getInvitations ~ getInvitations:', getInvitations)
+
+    // vì các dữ liệu inviter, invitee, board chỉ có một phần tử nên ta lấy sẵn ra luôn rồi trả về cho fe
+    const resInvitations = getInvitations.map(i => ({
+      ...i,
+      inviter: i.inviter[0] || {},
+      invitee: i.invitee[0] || {},
+      board: i.board[0] || {}
+    }))
+    return resInvitations
+  } catch (error) {
+    throw error
+  }
+}
+
 export const invitationService = {
-  createNewBoardInvitation
+  createNewBoardInvitation,
+  getInvitations
 }
