@@ -205,6 +205,19 @@ const getBoards = async (userId, page, itemsPerPage) => {
   } catch (error) { throw new Error(error) }
 }
 
+const pushMemberIds = async (boardId, userId) => {
+  try {
+    const result = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $push: {
+        memberIds: new ObjectId(userId)
+      } },
+      { returnDocument: 'after' } //có cái này để nó trả về document mới đã được update
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -214,5 +227,6 @@ export const boardModel = {
   pushColumnOrderIds,
   updateBoard,
   pullColumnOrderIds,
-  getBoards
+  getBoards,
+  pushMemberIds
 }
