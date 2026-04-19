@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser'
 // xử ly realtime với socket.io
 import socketIo from 'socket.io'
 import http from 'http'
+import { inviteUserToBoardSocket } from './sockets/InviteUserToBoardSocket'
 
 const START_APP = () => {
   const app = express()
@@ -38,11 +39,8 @@ const START_APP = () => {
   // khởi tạo biến io với server và cors
   const io = socketIo(server, { cors: corsOptions })
   io.on('connection', (socket) => {
-    // lắng nghe sự kiện mà client emit lên > FE_USER_INVITED_TO_BOARD
-    socket.on('FE_USER_INVITED_TO_BOARD', invitation => {
-      // cách làm nhanh và đơn giản nhất: emit ngược lại một sự kiện về cho mọi client khác (ngoại trừ chính cái thằng gửi req lên), rồi để bên FE check
-      socket.broadcast.emit('BE_USER_INVITED_TO_BOARD', invitation)
-    })
+    // gọi các socket tùy tính năng ở đây
+    inviteUserToBoardSocket(socket)
   })
 
   const hostname = env.APP_HOST
