@@ -163,7 +163,7 @@ const pullColumnOrderIds = async (column) => {
   } catch (error) { throw new Error(error) }
 }
 
-const getBoards = async (userId, page, itemsPerPage) => {
+const getBoards = async (userId, page, itemsPerPage, queryFilter) => {
   try {
     const queryCondition = [
       // b1: board chưa bị xóa
@@ -174,6 +174,17 @@ const getBoards = async (userId, page, itemsPerPage) => {
         { memberIds: new ObjectId(userId) }
       ] }
     ]
+
+    // xử lý queryFilter search theo title của board
+    // thêm điều kiên
+    if (queryFilter) {
+      Object.keys(queryFilter).forEach(key => {
+        // phân biệt hoa thường
+        // queryCondition.push({ [key]: { $regex: queryFilter[key] } })
+        // ko phân biệt hoa thường
+        queryCondition.push({ [key]: { $regex: new RegExp(queryFilter[key], 'i') } })
+      })
+    }
 
     const query = await mongodb.GET_DB().collection(BOARD_COLLECTION_NAME).aggregate(
       [
