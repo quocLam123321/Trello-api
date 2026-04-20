@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser'
 // xử ly realtime với socket.io
 import socketIo from 'socket.io'
 import http from 'http'
-import { inviteUserToBoardSocket } from './sockets/InviteUserToBoardSocket'
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket'
 
 const START_APP = () => {
   const app = express()
