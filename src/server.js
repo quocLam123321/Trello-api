@@ -43,16 +43,21 @@ const START_APP = () => {
     inviteUserToBoardSocket(socket)
   })
 
-  const hostname = env.APP_HOST
-  const port = env.APP_PORT
-
   // dùng server.listen thay vì app.listen vì lúc này server đã bao gồm cả app của express và đã config socket.io
-  server.listen(port, hostname, () => {
-    // eslint-disable-next-line no-console
-    console.log(`3. Server is running at http://${hostname}:${port}`)
-    if (env.BUILD_MODE === 'dev') console.log('4. Server is running in DEV mode')
-    else console.log('4. Server is running in PRODUCTION mode')
-  })
+  if (env.BUILD_MODE === 'dev') {
+    server.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+      // eslint-disable-next-line no-console
+      console.log('3. Server is running in DEVELOPMENT mode')
+      console.log(`4. Server is running at http://${env.LOCAL_DEV_APP_HOST}:${env.LOCAL_DEV_APP_PORT}`)
+    })
+  } else {
+    // production mode: đã deploy lên render nên sẽ tự động sinh port cho mình
+    server.listen(process.env.PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log('3. Server is running in PRODUCTION mode')
+      console.log(`4. Server is running at Port: ${process.env.PORT}`)
+    })
+  }
 }
 
 (async () => {
