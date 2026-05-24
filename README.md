@@ -88,6 +88,10 @@ Ensure you have the following installed on your machine:
    RESEND_API_KEY=your_resend_api_key
    ```
 
+> [!NOTE]
+> **Important Note on Email Verification:**
+> Since the project uses the **free tier of Resend**, verification emails may not be delivered. However, the system is configured to allow you to **log in directly** right after registering, without needing to wait for email activation.
+
 ---
 
 ## 🏃 Run Scripts
